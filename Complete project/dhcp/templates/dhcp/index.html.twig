@@ -1,0 +1,55 @@
+{# templates/dhcp/list.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}DHCP Host list{% endblock %}
+
+
+{% block body %}
+<div class="table-responsive">
+
+	<h3> voici le nombre d'utilisateur : <span id="nbHost"></span> provenant du fichier : <span id="access"></span> </h3>
+	<table class="table table-hover table-sm" id="tablehost"></table>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+
+	function searchHost()
+	{
+	    $.ajax({
+        url:"/listHost",
+		method: "post",
+		data: {host: $("#searchHost").val()},
+		dataType: 'json',
+		success: function (data) {
+			 $("#tablehost").find("tr").remove();
+			 $js = JSON.parse(data);
+			 $("#nbHost").text($js["dataLenght"]);
+			 $("#access").text($js["access"]);
+			var numLine = 0;
+			$.each($js["data"], function(index, element) {
+				var classCss = "";
+				numLine = numLine + 1;
+				if (element.fixedIpAddress != "")
+				{
+					classCss = 'class="table-warning"';
+				}
+				$('#tablehost').append('<tr '+classCss+'> <td id="ligne">' + numLine + '</td> <td><a href="/modifyHost?id='+element.hostname+'">'+element.hostname+'</td><td><a href="/modifyHost?id='+element.hostname+'">'+element.macAddress+'</td><td><a href="/modifyHost?id='+element.hostname+'">'+element.dateModif+'</td> <td><a href="/modifyHost?id='+element.hostname+'">'+element.fixedIpAddress+'</td></tr>');
+
+			});
+		}
+	    });
+	}
+
+    $(document).ready(function(){
+
+		searchHost();
+		$( "#searchHost" ).keyup(function() {
+		  //console.log( "Handler for .keypress() called." + $( "#searchHost" ).val());
+		  searchHost();
+		});
+
+    });
+</script>
+{% endblock %}

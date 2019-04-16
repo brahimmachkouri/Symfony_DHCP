@@ -1,0 +1,34 @@
+#index:
+#    path: /
+#    defaults: { _controller: 'App\Controller\DefaultController::index' }
+app_dhcp_main:
+    path: /
+    controller: App\Controller\DhcpController::index
+
+app_dhcp_ajax_list_host:
+    path: /listHost
+    controller: App\Controller\DhcpController::listHost
+
+app_dhcp_ajax_verify_host:
+    path: //verifyHostname
+    controller: App\Controller\DhcpController::verifyHostname
+
+app_dhcp_modif:
+    path: /modifyHost
+    controller: App\Controller\DhcpController::modify
+
+app_dhcp_new:
+    path: /newHost
+    controller: App\Controller\DhcpController::modifyForm
+
+app_dhcp_new1:
+    path: /saveHost
+    controller: App\Controller\DhcpController::saveHost
+
+app_dhcp_delete:
+    path: /deleteHost
+    controller: App\Controller\DhcpController::deleteHost
+
+app_dhcp_add:
+    path: /addNewHost
+    controller: App\Controller\DhcpController::addNewHost

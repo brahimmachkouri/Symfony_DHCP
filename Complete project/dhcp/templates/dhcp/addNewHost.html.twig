@@ -1,0 +1,154 @@
+{# templates/dhcp/list.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajout d'un nouveau l'host{% endblock %}
+
+{% block body %}
+<form action="/saveHost" id="formSaveHost" method="post">
+	<div class="form-row">
+		<div class="col-md-4 mb-3">
+		<label for="hostname">Hostname</label>
+		<input type="text" class="form-control" id="hostname" name="hostname" placeholder="18X51" value="">
+		</div>
+		<div class="col-md-4 mb-3">
+		<label for="hostname">MAC Address</label>
+		<input type="text" class="form-control" id="macAddress" name="macAddress" placeholder="AA:AA:AA:AA:AA" value="">
+		</div>
+		<div class="col-md-4 mb-3">
+		  <label for="dateModif">Date</label>
+		  <input type="text" class="form-control" id="dateModif" name="dateModif" placeholder="" value="">
+		</div>
+	</div>
+  <div class="form-row">
+    <div class="col-md-4 mb-3">
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="fixedIPCheck">
+        <label class="form-check-label" for="customCheck1">Check to set fixed IP</label>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label for="ipFixed">IP Address</label>
+      <input type="text" class="form-control" id="ipFixed" name="ipFixed" placeholder="192.168.0.1" value="">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="col-md-4 mb-3">
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="expirationDateCheck">
+        <label class="form-check-label" for="customCheck1">Expire ?</label>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label for="ipFixed">Expiration date</label>
+      <input type="text" class="form-control" id="expirationDate" name="expirationDate" placeholder="" value="">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="desciption">Description</label>
+    <textarea class="form-control" id="description" name="description" placeholder="description..." rows="5"></textarea>
+  </div>
+  <div class="form-group">
+    <label for="creator">Administrateur</label>
+    <select class="form-control" id="creator" name="creator">
+    {% for val in users %}
+      <option value="{{val.value}}">{{ val.name }}</option>
+    {% endfor %}
+    </select>
+  </div>
+</form>
+<button type="button" class="btn btn-link" id="backButton">Back</button>
+<button type="button" class="btn btn-success" id="saveButton">Save</button>
+
+<div id="hostExist" style="display:none;">
+	L'hote <b><span id="hostExist_hostname"></span></b> existe deja en base.
+  <button type="button" class="btn btn-success" id="hostExist_load">Charger</button>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+
+function loadPreviousHost() {
+  var url = "/modifyHost?id="+$("#hostname").val();
+  window.location.replace(url);
+}
+
+$(document).ready(function(){
+//    $("#hostExist").dialog({title: "Warning"}).parent().addClass("ui-state-error");
+//    $("#hostExist").dialog();
+//    $("#hostExist").hide();
+    $('#backButton').on('click', function(event) {
+      window.location = '/';
+    });
+    $('#fixedIPCheck').on('change', function(event) {
+      if ($('#fixedIPCheck').is(':checked')) {
+		$('#ipFixed').prop('disabled', false);
+	  }
+	  else
+	  {
+		$('#ipFixed').prop('disabled', true);
+	  }
+    });
+
+    $("#hostname").focusout(function() {
+	    $.ajax({
+		      url: "/verifyHostname",
+		      data: {id: $("#hostname").val()}
+	    }).done(function(json) {
+		   if (json['data'] == 1)
+	           {
+		      $("#hostExist").dialog({title: "Warning"}).parent().addClass("ui-state-error");
+                      $("#hostExist_hostname").text($("#hostname").val());
+		      $('#hostExist_load').attr("onclick","loadPreviousHost()");
+		      $("#hostExist").dialog();
+	           }
+	    })
+	    .fail(function() {
+	        alert( "error" );
+	    })
+	    //.always(function() {
+	        //alert( "complete" );
+	    //});
+    });
+    
+    $('#expirationDateCheck').on('change', function(event) {
+      if ($('#expirationDateCheck').is(':checked')) {
+		$('#expirationDate').prop('disabled', false);
+	  }
+	  else
+	  {
+		$('#expirationDate').prop('disabled', true);
+	  }
+    });
+    
+    // coche la checkbox d'IP fixe selon si le champ ipFixed est renreigne ou non
+	$('#fixedIPCheck').prop( "checked", $("#ipFixed").val() != "" );
+	if (!$('#fixedIPCheck').is(':checked')) {
+	  $('#ipFixed').prop('disabled', true);
+	}
+	
+	if(!$("#expirationDate").is(":checked")) {
+	  $('#expirationDate').prop('disabled', true);
+	}
+	
+	$("#expirationDate").datepicker({
+		language:"fr",
+	});
+	
+	$("#dateModif").datepicker({
+		language:"fr",
+	});
+	
+	$( "#saveButton" ).click(function() {
+		$( "#formSaveHost" ).submit();
+	});
+	$( "#deleteButton" ).click(function() {
+		
+	});
+	
+	$('#confirm-delete').on('show.bs.modal', function(e) {
+		$(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+	});
+});
+</script>
+{% endblock %}

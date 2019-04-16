@@ -1,0 +1,21 @@
+{# templates/dhcp/list.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}DHCP Host list{% endblock %}
+
+
+{% block body %}
+<h2>Nombre d'entrée du fichier '{{ fn }}' : {{ hosts|length }}</h2>
+<div class="table-responsive">
+	<table class="table table-hover table-sm">
+	{% for host in hosts %}
+	  
+      {% set class = '' %}
+	  {% if (host.fixedIpAddress != "") %}
+	     {% set class='class="table-warning"' %}
+	  {% endif %}
+			<tr {{ class|raw }}><th scope="row">{{ loop.index0 }}</th><td><a href="/modifyHost?id={{ host.hostname }}">{{ host.hostname }}</a></td><td><a href="/modifyHost?id={{ host.hostname }}">{{ host.macAddress }}</a></td><td><a href="/modifyHost?id={{ host.hostname }}">{{ host.dateModif|date }}</a></td><td><a href="/modifyHost?id={{ host.hostname }}">{{ host.expirationDate }}</a></td><td>{{ host.fixedIpAddress }}</td></tr>
+	{% endfor %}
+	</table>
+</div>
+{% endblock %}
